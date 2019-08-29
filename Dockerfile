@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+
+    watermeter:
+      container_name: wmeter
+      build: /home/pi/pimeter
+      restart: always
+      privileged: true
+      working_dir: /home/pi/pimeter
+      volumes:
+        - /home/pi/pimeter:/home/pi/pimeter
+        - /etc/localtime:/etc/localtime:ro
+      environment:
+        - PYTHONUNBUFFERED=0
+      depends_on:
+        - mosquitto
+
+    metersite:
+      container_name: wsite
+      build: /home/pi/pimeter/site
+      restart: always
+      volumes: 
+        - /home/pi/pimeter:/home/pi/pimeter
+        - /home/pi/pimeter/site/:/var/www/html
+        - /etc/localtime:/etc/localtime:ro
+      ports:
+        - "4040:80"
+
+    mosquitto:
+      container_name: mos-mqtt
+      image: eclipse-mosquitto
+      restart: always
+      ports:
+        - "1883:1883"
+        - "9001:9001"
